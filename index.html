@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroTerraX Pricing Calculator</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #00284B;
+            --orange: #F37021;
+            --olive: #C7E100;
+            --light-gray: #F5F5F5;
+            --medium-gray: #CCCCCC;
+            --text-dark: #333333;
+        }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border: 4px solid var(--navy);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--navy);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-style: italic;
+            color: var(--olive);
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid var(--orange);
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--navy);
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 4px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--orange);
+        }
+
+        .tier-description {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.95em;
+            display: none;
+        }
+
+        .tier-description.active {
+            display: block;
+        }
+
+        .acreage-input {
+            display: none;
+        }
+
+        .acreage-input.active {
+            display: block;
+        }
+
+        .residential-packages {
+            display: none;
+        }
+
+        .residential-packages.active {
+            display: block;
+        }
+
+        .package-option {
+            background-color: var(--light-gray);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .package-option:hover {
+            border-color: var(--orange);
+        }
+
+        .package-option.selected {
+            background-color: white;
+            border-color: var(--navy);
+        }
+
+        .package-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .checkbox-group {
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            margin-bottom: 10px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .checkbox-item label {
+            display: inline;
+            font-weight: 400;
+        }
+
+        .btn {
+            background-color: var(--orange);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2em;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #D5601C;
+        }
+
+        .btn:disabled {
+            background-color: var(--medium-gray);
+            cursor: not-allowed;
+        }
+
+        .quote-output {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background-color: white;
+            border: 3px solid var(--navy);
+            border-radius: 8px;
+        }
+
+        .quote-output.active {
+            display: block;
+        }
+
+        .quote-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--orange);
+        }
+
+        .quote-header h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            color: var(--navy);
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .quote-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .quote-section {
+            margin-bottom: 20px;
+        }
+
+        .quote-section h3 {
+            font-family: 'Barlow Condensed', sans-serif;
+            color: var(--navy);
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .calculation-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .calculation-line.total {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--navy);
+            border-top: 3px solid var(--navy);
+            border-bottom: none;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+
+        .discount-line {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        .included-list {
+            list-style-position: inside;
+            padding-left: 0;
+        }
+
+        .included-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            text-indent: -20px;
+        }
+
+        .quote-footer {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid var(--orange);
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-secondary {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #003a66;
+        }
+
+        .warning-note {
+            background-color: #FFF4E6;
+            border-left: 4px solid var(--orange);
+            padding: 12px 15px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #856404;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                border: none;
+                max-width: 100%;
+            }
+            
+            .content {
+                display: none;
+            }
+            
+            .action-buttons {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AEROTERRAX LAND SOLUTIONS</h1>
+            <div class="tagline">Smarter Land. Healthy Habitat.</div>
+            <div class="subtitle">Pricing Calculator | Quote valid for 30 days</div>
+        </header>
+
+        <div class="content">
+            <!-- Service Tier Selection -->
+            <div class="section">
+                <div class="section-title">Select Service</div>
+                <label for="tier-select">Service Tier</label>
+                <select id="tier-select">
+                    <option value="">-- Select a service --</option>
+                    <optgroup label="Residential & Small Farm (≤5 acres)">
+                        <option value="residential">Residential: Lawn & Garden Testing</option>
+                        <option value="small-farm">Small Farm: Soil Assessment (≤5 acres)</option>
+                    </optgroup>
+                    <optgroup label="Professional Services">
+                        <option value="tier0">Tier 0: Readiness Screening</option>
+                        <option value="tier1">Tier 1: Basic Soil Testing</option>
+                        <option value="tier2">Tier 2: Advanced Soil Testing</option>
+                        <option value="tier3">Tier 3: Precision Land Intelligence</option>
+                        <option value="tier4">Tier 4: Comprehensive Stewardship Planning ★</option>
+                        <option value="tier5">Tier 5: Regenerative Land Conversion ★</option>
+                    </optgroup>
+                </select>
+
+                <!-- Tier Descriptions -->
+                <div id="desc-residential" class="tier-description">
+                    Professional soil testing for homeowners, lawns, gardens, and landscaping projects.
+                </div>
+                <div id="desc-small-farm" class="tier-description">
+                    Professional-grade multi-zone soil analysis for properties up to 5 acres. On-site consultation included.
+                </div>
+                <div id="desc-tier0" class="tier-description">
+                    Desktop analysis and property consultation to identify the right service tier before investing. $225 credit applied if you proceed to Tier 3, 4, or 5 within 6 months.
+                </div>
+                <div id="desc-tier1" class="tier-description">
+                    Professional soil fertility mapping for informed fertilizer and lime decisions. 1 sample per 2 acres with GPS-tagged locations and NutriScan analysis.
+                </div>
+                <div id="desc-tier2" class="tier-description">
+                    Premium-density analysis with compaction testing and full GIS outputs. 1 sample per acre (2× density of Tier 1) with compaction testing included.
+                </div>
+                <div id="desc-tier3" class="tier-description">
+                    Integrated soil, vegetation, and property intelligence — the complete picture. Includes DJI Mavic 3 Multispectral (NDVI, NDRE, RGB orthomosaic) with topographic analysis.
+                </div>
+                <div id="desc-tier4" class="tier-description">
+                    <strong>★ Private-pay only</strong><br>
+                    Decision-grade management planning with resource prioritization, practice recommendations, multi-year implementation roadmap, and cost estimates.
+                </div>
+                <div id="desc-tier5" class="tier-description">
+                    <strong>★ Private-pay only</strong><br>
+                    Complete regenerative transformation roadmap with enhanced soil carbon baseline and carbon market readiness evaluation.
+                </div>
+            </div>
+
+            <!-- Residential Package Selection -->
+            <div id="residential-packages" class="section residential-packages">
+                <div class="section-title">Select Package</div>
+                <div class="package-option" onclick="selectResidentialPackage('single')">
+                    <input type="radio" name="residential-package" id="res-single" value="single">
+                    <label for="res-single"><strong>Single Sample — $75</strong><br>
+                    <small>One lawn area or one garden bed. NutriScan PDF with recommendations.</small></label>
+                </div>
+                <div class="package-option" onclick="selectResidentialPackage('standard')">
+                    <input type="radio" name="residential-package" id="res-standard" value="standard">
+                    <label for="res-standard"><strong>Standard Package — $100</strong><br>
+                    <small>Two distinct areas (front/back lawn or lawn/garden). Zone-specific reports.</small></label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="res-addon" value="addon">
+                    <label for="res-addon"><strong>Add-On: Detailed Interpretation & Consultation — +$25</strong></label>
+                </div>
+            </div>
+
+            <!-- Small Farm Package Selection -->
+            <div id="small-farm-packages" class="section residential-packages">
+                <div class="section-title">Select Package</div>
+                <div class="package-option" onclick="selectSmallFarmPackage('base')">
+                    <input type="radio" name="small-farm-package" id="sf-base" value="base">
+                    <label for="sf-base"><strong>Base Package — $150</strong><br>
+                    <small>≤5 acres, pasture/hay/mixed-use. 3-5 composite samples. NutriScan PDFs + site map + fert/lime by zone.</small></label>
+                </div>
+                <div class="package-option" onclick="selectSmallFarmPackage('premium')">
+                    <input type="radio" name="small-farm-package" id="sf-premium" value="premium">
+                    <label for="sf-premium"><strong>Premium Package — $250</strong><br>
+                    <small>Complex or intensive operations. 5-8 composite samples. Base + GIS outputs (KML, GeoTIFF) + detailed zone recommendations.</small></label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="sf-addon" value="addon">
+                    <label for="sf-addon"><strong>Add-On: Detailed Interpretation & Consultation — +$25</strong></label>
+                </div>
+            </div>
+
+            <!-- Acreage Input -->
+            <div id="acreage-input" class="section acreage-input">
+                <div class="section-title">Property Details</div>
+                <label for="acreage">Property Acreage</label>
+                <input type="number" id="acreage" placeholder="Enter acreage" min="0" step="0.1">                <div id="tier4-note" class="warning-note" style="display:none;">
+                    <strong>Tier 4 & 5 are available for properties 50+ acres only.</strong> For smaller properties requiring planning services, please contact us directly.
+                </div>
+            </div>
+
+            <!-- Discounts & Credits -->
+            <div class="section">
+                <div class="section-title">Discounts & Credits</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="discount-multiple" value="multiple">
+                        <label for="discount-multiple">Multiple properties (10% discount)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="discount-annual" value="annual">
+                        <label for="discount-annual">Annual contract (15% discount)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="discount-referral" value="referral">
+                        <label for="discount-referral">Referral credit ($100)</label>
+                    </div>
+                    <div class="checkbox-item" id="tier0-credit-option" style="display:none;">
+                        <input type="checkbox" id="discount-tier0" value="tier0">
+                        <label for="discount-tier0">Tier 0 credit applied ($225 — valid for T3/4/5 within 6 months)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculate Button -->
+            <button class="btn" id="calculate-btn" onclick="calculateQuote()">Calculate Quote</button>
+
+            <!-- Quote Output -->
+            <div id="quote-output" class="quote-output">
+                <div class="quote-header">
+                    <h2 id="quote-title">Service Quote</h2>
+                    <div class="quote-date" id="quote-date"></div>
+                    <div id="quote-property-details"></div>
+                </div>
+
+                <div class="quote-section">
+                    <h3>Price Calculation</h3>
+                    <div id="calculation-breakdown"></div>
+                </div>
+
+                <div class="quote-section" id="whats-included-section">
+                    <h3>What's Included</h3>
+                    <ul class="included-list" id="whats-included"></ul>
+                </div>
+
+                <div class="quote-footer">
+                    <p><strong>This is an estimate. Formal quote to follow.</strong></p>
+                    <p style="margin-top:10px;">Quote valid for 30 days from date generated.</p>
+                    <p style="margin-top:15px;">
+                        <strong>Contact Information</strong><br>
+                        (573) 537-8133 | jason@atxlandsolutions.com<br>
+                        www.atxlandsolutions.com
+                    </p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-secondary" onclick="printQuote()">Print / PDF</button>
+                    <button class="btn-secondary" onclick="emailQuote()">Email Quote</button>
+                    <button class="btn-secondary" onclick="textQuote()">Text Quote</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTier = '';
+        let currentPackage = '';
+        let quoteData = {};
+
+        // Tier selection handler
+        document.getElementById('tier-select').addEventListener('change', function(e) {
+            const tier = e.target.value;
+            currentTier = tier;
+            currentPackage = '';
+
+            // Hide all tier descriptions
+            document.querySelectorAll('.tier-description').forEach(desc => {
+                desc.classList.remove('active');
+            });
+
+            // Hide all input sections
+            document.getElementById('residential-packages').classList.remove('active');
+            document.getElementById('small-farm-packages').classList.remove('active');
+            document.getElementById('acreage-input').classList.remove('active');
+            document.getElementById('tier0-credit-option').style.display = 'none';
+            document.getElementById('tier4-note').style.display = 'none';
+
+            // Show relevant sections
+            if (tier) {
+                document.getElementById(`desc-${tier}`).classList.add('active');
+
+                if (tier === 'residential') {
+                    document.getElementById('residential-packages').classList.add('active');
+                } else if (tier === 'small-farm') {
+                    document.getElementById('small-farm-packages').classList.add('active');
+                } else if (tier === 'tier0') {
+                    // Tier 0 is flat fee, no acreage needed
+                    // Show option to apply credit to future tiers
+                } else if (tier === 'tier4' || tier === 'tier5') {
+                    document.getElementById('acreage-input').classList.add('active');
+                    document.getElementById('tier4-note').style.display = 'block';
+                } else {
+                    document.getElementById('acreage-input').classList.add('active');
+                }
+
+                // Show Tier 0 credit option for T3/4/5
+                if (tier === 'tier3' || tier === 'tier4' || tier === 'tier5') {
+                    document.getElementById('tier0-credit-option').style.display = 'block';
+                }
+            }
+
+            // Clear quote output
+            document.getElementById('quote-output').classList.remove('active');
+        });
+
+        function selectResidentialPackage(pkg) {
+            currentPackage = pkg;
+            document.querySelectorAll('#residential-packages .package-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.closest('.package-option').classList.add('selected');
+            document.getElementById(`res-${pkg}`).checked = true;
+        }
+
+        function selectSmallFarmPackage(pkg) {
+            currentPackage = pkg;
+            document.querySelectorAll('#small-farm-packages .package-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.closest('.package-option').classList.add('selected');
+            document.getElementById(`sf-${pkg}`).checked = true;
+        }
+
+        function calculateQuote() {
+            if (!currentTier) {
+                alert('Please select a service tier');
+                return;
+            }
+
+            if (currentTier === 'residential' || currentTier === 'small-farm') {
+                if (!currentPackage) {
+                    alert('Please select a package');
+                    return;
+                }
+            }
+
+            if ((currentTier.startsWith('tier') && currentTier !== 'tier0') || currentTier === 'small-farm') {
+                const acreage = parseFloat(document.getElementById('acreage').value);
+                if (!acreage || acreage <= 0) {
+                    alert('Please enter a valid acreage');
+                    return;
+                }
+            }
+
+            // Calculate pricing
+            let basePrice = 0;
+            let breakdown = [];
+            let included = [];
+            let tierName = '';
+            let propertyDetails = '';
+
+            // Residential
+            if (currentTier === 'residential') {
+                tierName = 'Residential: Lawn & Garden Testing';
+                if (currentPackage === 'single') {
+                    basePrice = 75;
+                    breakdown.push({ label: 'Single Sample', amount: 75 });
+                    included = [
+                        'One lawn area or garden bed',
+                        '1 composite sample (multiple cores)',
+                        'NutriScan 15+ parameter analysis',
+                        'NutriScan PDF with fertilizer/lime recommendations',
+                        'Turnaround: same-day or within 24 hours'
+                    ];
+                } else if (currentPackage === 'standard') {
+                    basePrice = 100;
+                    breakdown.push({ label: 'Standard Package', amount: 100 });
+                    included = [
+                        'Two distinct areas (front/back lawn or lawn/garden)',
+                        '2 composite soil samples',
+                        'NutriScan analysis on both samples',
+                        'Zone-specific PDF reports with individual recommendations',
+                        'Turnaround: same-day or within 24 hours'
+                    ];
+                }
+                if (document.getElementById('res-addon').checked) {
+                    basePrice += 25;
+                    breakdown.push({ label: 'Add-On: Detailed Interpretation & Consultation', amount: 25 });
+                    included.push('Custom written analysis (1-2 pages)', 'Detailed product recommendations', 'Follow-up phone or email consultation');
+                }
+            }
+
+            // Small Farm
+            else if (currentTier === 'small-farm') {
+                const acreage = parseFloat(document.getElementById('acreage').value);
+                tierName = 'Small Farm: Soil Assessment (≤5 acres)';
+                propertyDetails = `Property: ${acreage} acres`;
+                
+                if (currentPackage === 'base') {
+                    basePrice = 150;
+                    breakdown.push({ label: 'Base Package (≤5 acres)', amount: 150 });
+                    included = [
+                        'Pasture, hay, or mixed-use property',
+                        '3-5 composite samples by variability',
+                        'NutriScan PDFs + site map',
+                        'Fertilizer/lime recommendations by zone',
+                        'On-site consultation included',
+                        'Turnaround: same-day field / final 24-48 hours'
+                    ];
+                } else if (currentPackage === 'premium') {
+                    basePrice = 250;
+                    breakdown.push({ label: 'Premium Package (≤5 acres)', amount: 250 });
+                    included = [
+                        'Complex or intensive operations',
+                        '5-8 composite samples',
+                        'Base package deliverables',
+                        'GIS outputs (KML, GeoTIFF)',
+                        'Detailed zone recommendations',
+                        'On-site consultation included',
+                        'Turnaround: 3-5 business days'
+                    ];
+                }
+                if (document.getElementById('sf-addon').checked) {
+                    basePrice += 25;
+                    breakdown.push({ label: 'Add-On: Detailed Interpretation & Consultation', amount: 25 });
+                    included.push('Custom written analysis (1-2 pages)', 'Specific product/brand/source recommendations', 'Follow-up phone or email consultation');
+                }
+            }
+
+            // Tier 0
+            else if (currentTier === 'tier0') {
+                tierName = 'Tier 0: Readiness Screening';
+                basePrice = 450;
+                breakdown.push({ label: 'Flat fee', amount: 450 });
+                included = [
+                    '2-4 hour property consultation',
+                    'Desktop analysis: aerial imagery, soil surveys, public data',
+                    'Written readiness assessment report (8-10 pages)',
+                    'Clear tier recommendation with rationale and cost estimate',
+                    'Identification of issues that could block success',
+                    'Turnaround: 5-7 business days',
+                    '$225 credit applied if you proceed to Tier 3, 4, or 5 within 6 months'
+                ];
+            }
+
+            // Tiers 1-3
+            else if (currentTier === 'tier1' || currentTier === 'tier2' || currentTier === 'tier3') {
+                const acreage = parseFloat(document.getElementById('acreage').value);
+                propertyDetails = `Property: ${acreage} acres`;
+
+                const tierConfig = {
+                    tier1: {
+                        name: 'Tier 1: Basic Soil Testing',
+                        flatFees: { 5: 200, 10: 400, 15: 600, 20: 800 },
+                        base: 800,
+                        bands: [
+                            { max: 80, rate: 10 },
+                            { max: 160, rate: 9 },
+                            { max: 320, rate: 8 }
+                        ],
+                        included: [
+                            '1 sample per 2 acres (2-acre grid)',
+                            'GPS-tagged sample locations',
+                            'NutriScan 15+ parameters',
+                            'Spatial nutrient variability maps',
+                            'Management zone delineation',
+                            'Fertilizer and lime recommendations by zone',
+                            'PDF Report 8-12 pages + Excel data',
+                            'On-site consultation during sampling',
+                            'Turnaround: 5-7 business days (Rush +$200 or +25%)'
+                        ]
+                    },
+                    tier2: {
+                        name: 'Tier 2: Advanced Soil Testing',
+                        flatFees: { 5: 300, 10: 600, 15: 900, 20: 1200 },
+                        base: 1200,
+                        bands: [
+                            { max: 80, rate: 16 },
+                            { max: 160, rate: 14 },
+                            { max: 320, rate: 12 }
+                        ],
+                        included: [
+                            '1 sample per acre (2× density of Tier 1)',
+                            'GPS-tagged sample locations',
+                            'Compaction testing INCLUDED at all sample points',
+                            'Higher-resolution nutrient variability maps',
+                            'Refined management zone delineation',
+                            'Full GIS Digital Package: GeoTIFF, KML, Shapefiles',
+                            'Enhanced PDF Report 10-15 pages',
+                            'Everything in Tier 1',
+                            'Turnaround: 10-14 business days (Rush +$300 or +25%)'
+                        ]
+                    },
+                    tier3: {
+                        name: 'Tier 3: Precision Land Intelligence',
+                        flatFees: { 5: 450, 10: 900, 15: 1350, 20: 1800 },
+                        base: 1800,
+                        bands: [
+                            { max: 80, rate: 30 },
+                            { max: 160, rate: 27 },
+                            { max: 320, rate: 25 }
+                        ],
+                        included: [
+                            '1 sample per acre with 4-core composites',
+                            'DJI Mavic 3 Multispectral: NDVI, NDRE, RGB orthomosaic',
+                            'Integrated analysis: soil chemistry + compaction + vegetation',
+                            'Topographic analysis: elevation, contours, slope, drainage',
+                            'Infrastructure and vegetation community mapping',
+                            'Property baseline documentation',
+                            'Multispectral GIS outputs: GeoTIFF + PDF',
+                            'Comprehensive Report 20-25 pages',
+                            'Everything in Tier 2',
+                            'Turnaround: 14-21 business days (Rush +$500 or +25%)'
+                        ]
+                    }
+                };
+
+                const config = tierConfig[currentTier];
+                tierName = config.name;
+                included = config.included;
+
+                // Flat fee for ≤20 acres
+                if (acreage <= 5) {
+                    basePrice = config.flatFees[5];
+                    breakdown.push({ label: `Flat fee (≤5 acres)`, amount: config.flatFees[5] });
+                } else if (acreage <= 10) {
+                    basePrice = config.flatFees[10];
+                    breakdown.push({ label: `Flat fee (6-10 acres)`, amount: config.flatFees[10] });
+                } else if (acreage <= 15) {
+                    basePrice = config.flatFees[15];
+                    breakdown.push({ label: `Flat fee (11-15 acres)`, amount: config.flatFees[15] });
+                } else if (acreage <= 20) {
+                    basePrice = config.flatFees[20];
+                    breakdown.push({ label: `Base fee (16-20 acres)`, amount: config.flatFees[20] });
+                } else {
+                    // Banded pricing for >20 acres
+                    basePrice = config.base;
+                    breakdown.push({ label: `Base fee (≤20 acres)`, amount: config.base });
+
+                    let remainingAcres = acreage - 20;
+                    let lastBandMax = 20;
+
+                    for (let band of config.bands) {
+                        if (remainingAcres > 0) {
+                            const acresInBand = Math.min(remainingAcres, band.max - lastBandMax);
+                            const bandCost = acresInBand * band.rate;
+                            basePrice += bandCost;
+                            breakdown.push({
+                                label: `${lastBandMax + 1}-${band.max} acres: ${acresInBand.toFixed(1)} ac × $${band.rate}/ac`,
+                                amount: bandCost
+                            });
+                            remainingAcres -= acresInBand;
+                            lastBandMax = band.max;
+                        }
+                    }
+
+                    if (remainingAcres > 0) {
+                        breakdown.push({ label: `${lastBandMax + 1}+ acres: Custom quote required`, amount: 0 });
+                    }
+                }
+            }
+
+            // Tier 4
+            else if (currentTier === 'tier4') {
+                const acreage = parseFloat(document.getElementById('acreage').value);
+                tierName = 'Tier 4: Comprehensive Stewardship Planning ★ Private-pay only';
+                propertyDetails = `Property: ${acreage} acres`;
+
+                if (acreage < 50) {
+                    alert('Tier 4 services are available for properties 50+ acres only. Please contact us for smaller properties requiring planning services.');
+                    return;
+                }
+
+                if (acreage <= 100) {
+                    basePrice = 3500;
+                    breakdown.push({ label: 'Flat rate (50-100 acres)', amount: 3500 });
+                } else if (acreage <= 200) {
+                    basePrice = 4500;
+                    breakdown.push({ label: 'Flat rate (101-200 acres)', amount: 4500 });
+                } else if (acreage <= 320) {
+                    basePrice = 5500;
+                    breakdown.push({ label: 'Flat rate (201-320 acres)', amount: 5500 });
+                } else if (acreage <= 500) {
+                    basePrice = 7000;
+                    breakdown.push({ label: 'Flat rate (321-500 acres)', amount: 7000 });
+                } else {
+                    breakdown.push({ label: '500+ acres: Custom quote required', amount: 0 });
+                }
+
+                included = [
+                    'Resource concern prioritization: severity, urgency, feasibility',
+                    'Practice recommendations with justification and expected outcomes',
+                    'Multi-year implementation roadmap (Year 1, 2, 3+)',
+                    'Cost estimates: materials, contractor, DIY (low/mid/high)',
+                    'Habitat and wildlife assessment',
+                    'Hydrology and erosion management recommendations',
+                    'Monitoring protocols',
+                    'Comprehensive Report 30-40 pages',
+                    'Everything in Tier 3',
+                    'Turnaround: 4-6 weeks from Tier 3 data completion'
+                ];
+            }
+
+            // Tier 5
+            else if (currentTier === 'tier5') {
+                const acreage = parseFloat(document.getElementById('acreage').value);
+                tierName = 'Tier 5: Regenerative Land Conversion ★ Private-pay only';
+                propertyDetails = `Property: ${acreage} acres`;
+
+                if (acreage < 50) {
+                    alert('Tier 5 services are available for properties 50+ acres only. Please contact us for smaller properties.');
+                    return;
+                }
+
+                if (acreage <= 100) {
+                    basePrice = 7500;
+                    breakdown.push({ label: 'Flat rate (50-100 acres)', amount: 7500, note: '$7,000-8,000 range' });
+                } else if (acreage <= 200) {
+                    basePrice = 9500;
+                    breakdown.push({ label: 'Flat rate (101-200 acres)', amount: 9500, note: '$9,000-10,000 range' });
+                } else if (acreage <= 320) {
+                    basePrice = 11750;
+                    breakdown.push({ label: 'Flat rate (201-320 acres)', amount: 11750, note: '$11,000-12,500 range' });
+                } else if (acreage <= 500) {
+                    basePrice = 14000;
+                    breakdown.push({ label: 'Flat rate (321-500 acres)', amount: 14000, note: '$13,000-15,000 range' });
+                } else {
+                    breakdown.push({ label: '500+ acres: Custom quote required', amount: 0 });
+                }
+
+                included = [
+                    'Enhanced soil carbon baseline (higher-density sampling)',
+                    'Carbon market readiness evaluation',
+                    'Regenerative system design: species selection, seed mix specs',
+                    'Long-term monitoring and adaptive management protocols',
+                    'Multi-year implementation roadmap with sequencing',
+                    'Cost estimates',
+                    'Comprehensive Report 40-50 pages',
+                    'Everything in Tier 4',
+                    'Turnaround: 6-8 weeks from Tier 3 data completion'
+                ];
+            }
+
+            // Apply discounts
+            let subtotal = basePrice;
+            breakdown.push({ label: 'Subtotal', amount: subtotal, isSubtotal: true });
+
+            let discounts = [];
+            
+            if (document.getElementById('discount-multiple').checked) {
+                const discount = subtotal * 0.10;
+                discounts.push({ label: 'Multiple properties (10%)', amount: -discount });
+            }
+
+            if (document.getElementById('discount-annual').checked) {
+                const discount = subtotal * 0.15;
+                discounts.push({ label: 'Annual contract (15%)', amount: -discount });
+            }
+
+            if (document.getElementById('discount-referral').checked) {
+                discounts.push({ label: 'Referral credit', amount: -100 });
+            }
+
+            if (document.getElementById('discount-tier0') && document.getElementById('discount-tier0').checked) {
+                discounts.push({ label: 'Tier 0 credit applied', amount: -225 });
+            }
+
+            let totalDiscount = 0;
+            discounts.forEach(d => {
+                totalDiscount += Math.abs(d.amount);
+                breakdown.push(d);
+            });
+
+            const finalPrice = Math.max(0, subtotal - totalDiscount);
+
+            // Store quote data
+            quoteData = {
+                tierName,
+                propertyDetails,
+                breakdown,
+                included,
+                finalPrice,
+                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+            };
+
+            // Display quote
+            displayQuote();
+        }
+
+        function displayQuote() {
+            document.getElementById('quote-title').textContent = quoteData.tierName;
+            document.getElementById('quote-date').textContent = quoteData.date;
+            document.getElementById('quote-property-details').textContent = quoteData.propertyDetails;
+
+            // Calculation breakdown
+            let breakdownHTML = '';
+            quoteData.breakdown.forEach(item => {
+                if (item.isSubtotal) {
+                    breakdownHTML += `<div class="calculation-line" style="border-top: 2px solid var(--medium-gray); margin-top: 10px; padding-top: 10px;">
+                        <span><strong>${item.label}</strong></span>
+                        <span><strong>$${item.amount.toFixed(2)}</strong></span>
+                    </div>`;
+                } else if (item.amount < 0) {
+                    breakdownHTML += `<div class="calculation-line discount-line">
+                        <span>${item.label}</span>
+                        <span>-$${Math.abs(item.amount).toFixed(2)}</span>
+                    </div>`;
+                } else {
+                    const noteText = item.note ? ` <small>(${item.note})</small>` : '';
+                    breakdownHTML += `<div class="calculation-line">
+                        <span>${item.label}${noteText}</span>
+                        <span>$${item.amount.toFixed(2)}</span>
+                    </div>`;
+                }
+            });
+
+            breakdownHTML += `<div class="calculation-line total">
+                <span>TOTAL PRICE</span>
+                <span>$${quoteData.finalPrice.toFixed(2)}</span>
+            </div>`;
+
+            document.getElementById('calculation-breakdown').innerHTML = breakdownHTML;
+
+            // What's included
+            let includedHTML = '';
+            quoteData.included.forEach(item => {
+                includedHTML += `<li>${item}</li>`;
+            });
+            document.getElementById('whats-included').innerHTML = includedHTML;
+
+            // Show quote
+            document.getElementById('quote-output').classList.add('active');
+            document.getElementById('quote-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function printQuote() {
+            window.print();
+        }
+
+        function emailQuote() {
+            const subject = encodeURIComponent(`AeroTerraX Quote: ${quoteData.tierName}`);
+            const body = encodeURIComponent(generateEmailBody());
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        function textQuote() {
+            const smsBody = encodeURIComponent(generateSMSBody());
+            window.location.href = `sms:?&body=${smsBody}`;
+        }
+
+        function generateEmailBody() {
+            let body = `AEROTERRAX LAND SOLUTIONS\nSmarter Land. Healthy Habitat.\n\n`;
+            body += `QUOTE SUMMARY\n`;
+            body += `${quoteData.tierName}\n`;
+            if (quoteData.propertyDetails) {
+                body += `${quoteData.propertyDetails}\n`;
+            }
+            body += `Date: ${quoteData.date}\n\n`;
+
+            body += `PRICE CALCULATION\n`;
+            quoteData.breakdown.forEach(item => {
+                if (item.amount !== 0) {
+                    const amt = item.amount < 0 ? `-$${Math.abs(item.amount).toFixed(2)}` : `$${item.amount.toFixed(2)}`;
+                    body += `${item.label}: ${amt}\n`;
+                }
+            });
+            body += `\nTOTAL PRICE: $${quoteData.finalPrice.toFixed(2)}\n\n`;
+
+            body += `WHAT'S INCLUDED\n`;
+            quoteData.included.forEach(item => {
+                body += `• ${item}\n`;
+            });
+
+            body += `\n---\n`;
+            body += `This is an estimate. Formal quote to follow.\n`;
+            body += `Quote valid for 30 days from date generated.\n\n`;
+            body += `Contact: (573) 537-8133\n`;
+            body += `jason@atxlandsolutions.com\n`;
+            body += `www.atxlandsolutions.com`;
+
+            return body;
+        }
+
+        function generateSMSBody() {
+            let body = `AeroTerraX Land Solutions\nSmarter Land. Healthy Habitat.\n\n`;
+            body += `QUOTE SUMMARY\n`;
+            body += `${quoteData.tierName}\n`;
+            if (quoteData.propertyDetails) {
+                body += `${quoteData.propertyDetails}\n`;
+            }
+            body += `\nPRICE CALCULATION\n`;
+            
+            quoteData.breakdown.forEach(item => {
+                if (item.amount !== 0) {
+                    const amt = item.amount < 0 ? `-$${Math.abs(item.amount).toFixed(2)}` : `$${item.amount.toFixed(2)}`;
+                    body += `${item.label}: ${amt}\n`;
+                }
+            });
+
+            body += `\nTOTAL: $${quoteData.finalPrice.toFixed(2)}\n\n`;
+            body += `Estimate only. Formal quote to follow.\n\n`;
+            body += `Contact: (573) 537-8133\n`;
+            body += `jason@atxlandsolutions.com\n`;
+            body += `www.atxlandsolutions.com`;
+
+            return body;
+        }
+    </script>
+</body>
+</html>
