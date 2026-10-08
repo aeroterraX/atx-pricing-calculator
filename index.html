@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ATX Quote">
 <meta name="theme-color" content="#2E4A2E">
-<title>ATX Quote Builder</title>
+<title>ATX Quote Builder v2.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -607,6 +607,29 @@
       padding: 18px;
     }
   }
+
+  .scope-warning {
+    background: #FFF2CC;
+    border-left: 4px solid var(--gold-olive-deep);
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    margin-top: 12px;
+    font-size: 0.86rem;
+    color: var(--charcoal);
+  }
+  .scope-warning strong { color: var(--forest); }
+  .reference-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+  .reference-card {
+    background: var(--white); border:1px solid var(--warm-gray-200);
+    border-left:4px solid var(--gold-olive); border-radius:var(--radius); padding:14px 16px;
+  }
+  .reference-card .name {
+    font-family:var(--font-head); font-weight:700; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--forest); margin-bottom:5px;
+  }
+  .reference-card .rate { font-family:var(--font-head); font-weight:800; color:var(--terracotta); font-size:1.05rem; }
+  .reference-card .note { font-size:.78rem; color:var(--warm-gray-400); margin-top:5px; line-height:1.45; }
+  .direct-note { font-size:.78rem; color:var(--warm-gray-400); margin-top:4px; font-style:italic; }
 </style>
 </head>
 <body>
@@ -619,759 +642,367 @@
 <nav>
   <button class="active" data-view="quote">Quote</button>
   <button data-view="history">History</button>
-  <button data-view="tuning">Pricing</button>
+  <button data-view="pricing">Pricing</button>
   <button data-view="about">About</button>
 </nav>
 
 <main>
-
-<!-- ─── QUOTE BUILDER VIEW ─── -->
 <div id="view-quote" class="view active">
-
   <div class="section">
     <h2>Client Info</h2>
-    <div class="field">
-      <label for="clientName">Client Name</label>
-      <input type="text" id="clientName" autocomplete="off">
-    </div>
-    <div class="field">
-      <label for="clientEmail">Client Email</label>
-      <input type="email" id="clientEmail" autocomplete="off" inputmode="email">
-      <div class="hint">Used for the mailto quote-summary email</div>
-    </div>
-    <div class="field">
-      <label for="propertyLocation">Property Location</label>
-      <input type="text" id="propertyLocation" autocomplete="off">
-    </div>
+    <div class="field"><label for="clientName">Client Name</label><input type="text" id="clientName" autocomplete="off"></div>
+    <div class="field"><label for="clientEmail">Client Email</label><input type="email" id="clientEmail" autocomplete="off" inputmode="email"><div class="hint">Used for the mailto estimate-summary email</div></div>
+    <div class="field"><label for="propertyLocation">Property Location</label><input type="text" id="propertyLocation" autocomplete="off"></div>
   </div>
 
   <div class="section">
     <h2>Engagement Scope</h2>
     <div class="field">
-      <label for="offering">Offering</label>
+      <label for="offering">Service</label>
       <select id="offering">
-        <option value="Precision Land Intelligence">Precision Land Intelligence</option>
-        <option value="Property Screening">Property Screening</option>
-        <option value="Prescribed Fire Planning (Feasibility)">Prescribed Fire Planning (Feasibility)</option>
-        <option value="Prescribed Fire Planning (Burn Plan)">Prescribed Fire Planning (Burn Plan)</option>
-        <option value="Soil Testing NRCS Compliance">Soil Testing (NRCS Compliance)</option>
-        <option value="Soil Testing Zone or Grid">Soil Testing (Zone or Grid)</option>
-        <option value="GIS Mapping Standard">GIS Mapping (Standard)</option>
-        <option value="GIS Mapping Standard Plus Deeper">GIS Mapping (Standard + Deeper)</option>
-        <option value="Aerial Property Mapping">Aerial Property Mapping</option>
+        <option value="PLI">Precision Land Intelligence (PLI)</option>
+        <option value="LAnDS">Land Analysis and Decision Support (LAnDS)</option>
+        <option value="Precision Soil Testing">Precision Soil Testing</option>
+        <option value="Prescribed Fire Planning">Prescribed Fire Planning</option>
+        <option value="RGB Aerial Mapping">RGB Aerial Mapping</option>
+        <option value="Multispectral Mapping">Multispectral Mapping</option>
+        <option value="Multispectral Mapping + Analysis">Multispectral Mapping + Analysis</option>
       </select>
     </div>
-
-    <div class="field" id="landUsesField">
-      <label for="landUses">Number of Land Uses <span style="color:#999;font-weight:normal">(PLI only)</span></label>
-      <select id="landUses">
-        <option value="Small Farm">Small Farm</option>
-        <option value="One Land Use">One Land Use</option>
-        <option value="Two Land Uses" selected>Two Land Uses</option>
-        <option value="Three Land Uses">Three Land Uses</option>
-      </select>
+    <div class="field"><label for="acreage">Scoped Acreage</label><input type="number" id="acreage" inputmode="decimal" min="0" step="0.1" value="0"><div class="hint">Use acreage applicable to the selected service/management area.</div></div>
+    <div class="field hidden" id="landsValidationField">
+      <label for="landsValidation">LAnDS Field Validation</label>
+      <select id="landsValidation"><option value="No">No</option><option value="Yes">Yes · +$500</option></select>
     </div>
-
-    <div class="field" id="acreageField">
-      <label for="acreage">Total Acreage</label>
-      <input type="number" id="acreage" inputmode="numeric" min="0" value="0">
+    <div class="field hidden" id="wetLabField">
+      <label for="wetLabCount">Required Wet-Lab Composite Samples</label>
+      <input type="number" id="wetLabCount" inputmode="numeric" min="0" step="1" value="0">
+      <div class="hint">$22 per required composite, including shipping.</div>
     </div>
-
-    <div class="field hidden" id="sampleCountField">
-      <label for="sampleCount">Sample Count <span style="color:#999;font-weight:normal">(Soil Testing only)</span></label>
-      <input type="number" id="sampleCount" inputmode="numeric" min="0" value="0">
-    </div>
-
     <div class="field">
-      <label for="huStatus">HU Status</label>
-      <select id="huStatus">
-        <option value="Standard">Standard</option>
-        <option value="HU">Historically Underserved</option>
-      </select>
-      <div class="hint">HU: 20% NRCS payment premium</div>
+      <label for="scopeStatus">Scope Status</label>
+      <select id="scopeStatus"><option value="Standard">Standard</option><option value="Atypical">Atypical / requires review</option></select>
     </div>
-
-    <div class="field">
-      <label for="complexity">Complexity Multiplier</label>
-      <select id="complexity">
-        <option value="1.0">1.0 · Standard</option>
-        <option value="1.1">1.1 · Slightly elevated</option>
-        <option value="1.2">1.2 · Moderately elevated</option>
-        <option value="1.3">1.3 · Elevated</option>
-        <option value="1.4">1.4 · High</option>
-        <option value="1.5">1.5 · Maximum</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="costShare">Cost-Share Pursuit</label>
-      <select id="costShare">
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-        <option value="Unsure">Unsure</option>
-      </select>
-    </div>
+    <div id="scopeWarning" class="scope-warning hidden"></div>
   </div>
 
   <div class="section">
-    <h2>Calculations</h2>
-    <div class="calc-row">
-      <div class="label">Base Fee</div>
-      <div class="value" id="calcBaseFee">$0.00</div>
-    </div>
-    <div class="calc-row">
-      <div class="label">Per-Unit Rate</div>
-      <div class="value" id="calcPerUnit">$0.00</div>
-    </div>
-    <div class="calc-row">
-      <div class="label">Unit Count</div>
-      <div class="value" id="calcUnitCount">0</div>
-    </div>
-    <div class="calc-row">
-      <div class="label">Subtotal</div>
-      <div class="value" id="calcSubtotal">$0.00</div>
-    </div>
-    <div class="calc-row total">
-      <div class="label">ATX Quote (before adjustments)</div>
-      <div class="value" id="calcAtxQuote">$0.00</div>
-    </div>
+    <h2>Core Service Calculation</h2>
+    <div class="calc-row"><div class="label">Base Fee</div><div class="value" id="calcBaseFee">$0.00</div></div>
+    <div class="calc-row"><div class="label">Per-Acre Rate</div><div class="value" id="calcPerAcre">$0.00</div></div>
+    <div class="calc-row"><div class="label">Scoped Acreage</div><div class="value" id="calcAcreage">0</div></div>
+    <div class="calc-row total"><div class="label">Core Service Fee</div><div class="value" id="calcCoreFee">$0.00</div></div>
   </div>
 
   <div class="section">
-    <h2>NRCS Envelope</h2>
-    <div class="calc-row">
-      <div class="label">NRCS Payment (to client)</div>
-      <div class="value" id="calcNrcsEnvelope">$0.00</div>
-    </div>
-    <div class="calc-row" id="clientNetRow">
-      <div class="label">Client Net After Reimbursement</div>
-      <div class="value" id="calcClientNet">$0.00</div>
-    </div>
-    <div class="pattern-box">
-      <div class="label">Recommended Pattern</div>
-      <div class="value" id="calcPattern">—</div>
-    </div>
+    <h2>Options & Direct Costs</h2>
+    <div class="calc-row hidden" id="landsValidationCalcRow"><div class="label">LAnDS Field Validation</div><div class="value" id="calcLandsValidation">$0.00</div></div>
+    <div class="calc-row hidden" id="wetLabCalcRow"><div class="label">Wet-Lab Composites</div><div class="value" id="calcWetLab">$0.00</div></div>
+    <div class="field"><label for="adjTravel">Travel / Mobilization ($)</label><input type="number" id="adjTravel" inputmode="decimal" min="0" value="0" step="1"><div class="direct-note">Enter the engagement-specific quoted amount when applicable.</div></div>
+    <div class="field"><label for="adjPrinting">Vendor Map Printing ($)</label><input type="number" id="adjPrinting" inputmode="decimal" min="0" value="0" step="1"><div class="direct-note">Optional vendor fulfillment/pass-through.</div></div>
+    <div class="field"><label for="adjOther">Other Direct Expense ($)</label><input type="number" id="adjOther" inputmode="decimal" min="0" value="0" step="1"></div>
+    <div class="field"><label for="directCostNotes">Direct Cost Notes</label><textarea id="directCostNotes" placeholder="Optional explanation of travel, printing, or other direct expense."></textarea></div>
+    <div class="calc-row"><div class="label">Options / Direct Costs</div><div class="value" id="calcDirectCosts">$0.00</div></div>
   </div>
 
   <div class="section">
-    <h2>Adjustments (Optional)</h2>
-    <div class="field">
-      <label for="adjTravel">Travel Adjustment ($)</label>
-      <input type="number" id="adjTravel" inputmode="decimal" value="0" step="10">
-      <div class="hint">Add for out-of-area travel days</div>
-    </div>
-    <div class="field">
-      <label for="adjBundle">Bundle Reduction ($)</label>
-      <input type="number" id="adjBundle" inputmode="decimal" value="0" step="10">
-      <div class="hint">Negative value; subtract for multi-offering</div>
-    </div>
-    <div class="field">
-      <label for="adjRepeat">Repeat Client Adjustment ($)</label>
-      <input type="number" id="adjRepeat" inputmode="decimal" value="0" step="10">
-      <div class="hint">Negative value; subtract for known-property efficiency</div>
-    </div>
-    <div class="field">
-      <label for="adjCustom">Custom Adjustment ($)</label>
-      <input type="number" id="adjCustom" inputmode="decimal" value="0" step="10">
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>Final Quote</h2>
-    <div class="calc-row total">
-      <div class="label">FINAL ATX QUOTE</div>
-      <div class="value" id="calcFinalQuote">$0.00</div>
-    </div>
-    <div class="calc-row" id="finalClientNetRow">
-      <div class="label">Client Net After Reimbursement</div>
-      <div class="value" id="calcFinalClientNet">$0.00</div>
-    </div>
+    <h2>Estimate</h2>
+    <div class="calc-row"><div class="label">Core Service Fee</div><div class="value" id="calcCoreSummary">$0.00</div></div>
+    <div class="calc-row"><div class="label">Options / Direct Costs</div><div class="value" id="calcDirectSummary">$0.00</div></div>
+    <div class="calc-row total"><div class="label">ESTIMATED TOTAL</div><div class="value" id="calcFinalQuote">$0.00</div></div>
+    <div class="pattern-box"><div class="label">Pricing Control</div><div class="value" id="calcControl">ATX-PRICE-001 v2.0</div></div>
   </div>
 
   <div class="section">
     <h2>Actions</h2>
-    <button class="btn btn-primary" id="btnEmail">Email Summary to Client</button>
-    <button class="btn btn-secondary" id="btnSave">Save Quote to History</button>
+    <button class="btn btn-primary" id="btnEmail">Email Estimate Summary</button>
+    <button class="btn btn-secondary" id="btnSave">Save Estimate to History</button>
     <button class="btn btn-tertiary" id="btnClear">Clear and Start New</button>
   </div>
-
 </div>
 
-<!-- ─── HISTORY VIEW ─── -->
 <div id="view-history" class="view">
-  <div class="notice">
-    <strong>Quote history</strong> stored locally on this device. Not synced anywhere. Clearing browser data will erase history.
-  </div>
+  <div class="notice"><strong>Estimate history</strong> is stored locally on this device. It is not synced. Clearing browser data will erase history.</div>
   <div id="historyList"></div>
 </div>
 
-<!-- ─── PRICING TUNING VIEW ─── -->
-<div id="view-tuning" class="view">
-  <div class="notice">
-    <strong>Tunable pricing formulas.</strong> Edit these to adjust base fees and per-unit rates. Changes save to this device only. Tap Reset to restore defaults.
-  </div>
-  <div id="tuningList"></div>
-  <button class="btn btn-tertiary" id="btnResetPricing">Reset to Defaults</button>
+<div id="view-pricing" class="view">
+  <div class="notice"><strong>Read-only pricing reference.</strong> Approved rates are controlled by ATX-PRICE-001 v2.0. Change rates in the controlled pricing framework first, then update this app.</div>
+  <div id="pricingReference" class="reference-grid"></div>
 </div>
 
-<!-- ─── ABOUT VIEW ─── -->
 <div id="view-about" class="view">
   <div class="section">
     <h2>About This App</h2>
-    <p style="font-size: 14px;">
-      <strong>ATX Quote Builder v1.0</strong><br>
-      Internal pricing tool for AeroTerraX Land Solutions field scoping conversations.
-    </p>
-    <p style="font-size: 14px;">
-      Implements the formula-based pricing framework (Base Fee + Per-Unit Rate × Count + Complexity Multiplier) documented in ATX-PRICE-001 v1.0. NRCS payment envelopes sourced from Missouri EQIP-1 cost list, 2025-2026. Pre-certification pricing structure; will require revision upon TSP certification activation.
-    </p>
-    <p style="font-size: 14px;">
-      <strong>Data storage:</strong> All quote history and pricing tuning is stored locally on this device using browser localStorage. Nothing is sent anywhere. Clearing browser data will erase both.
-    </p>
-    <p style="font-size: 14px;">
-      <strong>Email delivery:</strong> The "Email Summary to Client" button opens your phone's default mail app with a pre-filled quote summary. You review and tap Send. The email comes from your phone's mail account and appears in your Sent folder.
-    </p>
-    <p style="font-size: 14px;">
-      <strong>Companion documents:</strong> ATX-PRICE-001 v1.0 (Word document, full framework); ATX-PRICE-001 Quote Builder (Excel workbook, office estimate development).
-    </p>
+    <p><strong>ATX Quote Builder v2.0</strong><br>Internal estimate-development tool for AeroTerraX Land Solutions.</p>
+    <p>Implements the approved ATX-PRICE-001 v2.0 pricing architecture: <strong>Base Fee + (Scoped Acreage × Approved Per-Acre Rate) + Applicable Options / Direct Costs.</strong></p>
+    <p>The former universal complexity multiplier, Property Screening, standalone GIS offerings, NRCS reimbursement-pattern calculation, and editable local pricing have been retired from the v2.0 quote workflow.</p>
+    <p><strong>NRCS relationship:</strong> NRCS payment schedules may support internal benchmarking, but they do not dictate the ATX professional-service fee and this app does not estimate or promise client reimbursement.</p>
+    <p><strong>Data storage:</strong> Estimate history is stored locally using browser localStorage. Nothing is transmitted by the app. Clearing browser data will erase history.</p>
+    <p><strong>Email delivery:</strong> Email Estimate Summary opens the device's default mail application with a pre-filled estimate. Review it before sending.</p>
+    <p><strong>Companion controls:</strong> ATX-PRICE-001 v2.0 (authoritative Word framework); ATX-PRICE-001 Quote Builder v2.0 (Excel); ATX Pricing Reference - Quicken v2.0.</p>
   </div>
-
   <div class="section">
-    <h2>Reference Ranges</h2>
-    <p style="font-size: 13px; margin-bottom: 4px;">If asked directly about pricing during scoping, communicate ranges only:</p>
-    <ul style="font-size: 13px; padding-left: 20px;">
-      <li>Precision Land Intelligence: $3,000 to $6,000</li>
-      <li>Prescribed Fire Planning: $700 to $1,200</li>
-      <li>Soil Testing (NRCS Compliance): $1,500 to $4,000</li>
-      <li>Property Screening: $400 to $1,000</li>
-      <li>GIS Mapping and Spatial Analysis: $500 to $2,500</li>
-      <li>Aerial Property Mapping: $500 to $1,500</li>
+    <h2>Scope Rules</h2>
+    <ul>
+      <li>PLI and LAnDS standard formulas apply through 200 acres; larger engagements require individual scoping.</li>
+      <li>LAnDS field validation is an optional $500 add-on; applicable travel remains separate.</li>
+      <li>Precision Soil Testing wet-lab analysis is $22 per required composite sample, including shipping.</li>
+      <li>Compaction testing is not part of the Precision Soil Testing offering.</li>
+      <li>Prescribed Fire Planning is planning only; implementation, Burn Boss services, personnel, equipment, and execution are excluded.</li>
+      <li>Physical map printing is optional vendor fulfillment/pass-through.</li>
+      <li>GIS is an embedded technical capability, not a standalone ATX offering.</li>
+      <li>Atypical scope is reviewed individually rather than handled with a complexity multiplier.</li>
     </ul>
   </div>
-
   <div class="section">
-    <h2>Deploy to GitHub Pages</h2>
-    <ol style="font-size: 13px; padding-left: 20px;">
-      <li>Create a new GitHub repo (public or private).</li>
-      <li>Upload this file as <code>index.html</code>.</li>
-      <li>In repo Settings → Pages, enable Pages from main branch.</li>
-      <li>Access via <code>https://[username].github.io/[reponame]/</code>.</li>
-      <li>On your phone, open in Safari or Chrome, then "Add to Home Screen" for one-tap access.</li>
+    <h2>Deployment</h2>
+    <ol>
+      <li>Replace the repository's existing <code>index.html</code> with this v2.0 file.</li>
+      <li>Commit and push to the branch used by GitHub Pages.</li>
+      <li>Open the deployed page and hard-refresh once to ensure the new file is loaded.</li>
+      <li>Saved v1.0 history may remain in localStorage, but v2.0 automatically separates its history under a new storage key.</li>
     </ol>
   </div>
 </div>
-
 </main>
 
-<footer>
-  AeroTerraX Land Solutions · Internal Operations · v1.0
-</footer>
+<footer>AeroTerraX Land Solutions · Internal Operations · Quote Builder v2.0</footer>
 
 <script>
-  // ═══════════════════════════════════════════════════════
-  // DATA CONSTANTS
-  // ═══════════════════════════════════════════════════════
 
-  const DEFAULT_PRICING = {
-    'Precision Land Intelligence': { baseFee: 2400, perUnit: 4.00, unit: 'acre' },
-    'Property Screening': { baseFee: 400, perUnit: 0.75, unit: 'acre' },
-    'Prescribed Fire Planning (Feasibility)': { baseFee: 500, perUnit: 0.25, unit: 'acre' },
-    'Prescribed Fire Planning (Burn Plan)': { baseFee: 700, perUnit: 0.50, unit: 'acre' },
-    'Soil Testing NRCS Compliance': { baseFee: 400, perUnit: 250, unit: 'sample' },
-    'Soil Testing Zone or Grid': { baseFee: 800, perUnit: 200, unit: 'sample' },
-    'GIS Mapping Standard': { baseFee: 500, perUnit: 1.75, unit: 'acre' },
-    'GIS Mapping Standard Plus Deeper': { baseFee: 500, perUnit: 3.50, unit: 'acre' },
-    'Aerial Property Mapping': { baseFee: 500, perUnit: 2.00, unit: 'acre' },
-  };
+const APP_VERSION = '2.0';
+const PRICING_CONTROL = 'ATX-PRICE-001 v2.0';
 
-  const NRCS_ENVELOPES = {
-    'Precision Land Intelligence': {
-      'Small Farm':        { standard: 2573.40, hu: 3088.07 },
-      'One Land Use':      { standard: 2839.25, hu: 3407.09 },
-      'Two Land Uses':     { standard: 4389.75, hu: 5267.70 },
-      'Three Land Uses':   { standard: 6153.48, hu: 7384.18 },
-    },
-    'Prescribed Fire Planning (Feasibility)': { flat: { standard: 1089.23, hu: 1307.07 } },
-    'Prescribed Fire Planning (Burn Plan)':   { flat: { standard: 1089.23, hu: 1307.07 } },
-    'Soil Testing NRCS Compliance':           { perSample: { standard: 520.43, hu: 624.51 } },
-    'Soil Testing Zone or Grid':              { perSample: { standard: 1739.63, hu: 2087.56 } },
-    // Non-NRCS offerings: no envelope
-    'Property Screening':                     null,
-    'GIS Mapping Standard':                   null,
-    'GIS Mapping Standard Plus Deeper':       null,
-    'Aerial Property Mapping':                null,
-  };
+const PRICING = {
+  'PLI': { display:'Precision Land Intelligence (PLI)', baseFee:3800, perAcre:4.75, maxStandardAcres:200, note:'Standard pricing assumes one land use. Above 200 acres: individually scoped.' },
+  'LAnDS': { display:'Land Analysis and Decision Support (LAnDS)', baseFee:1650, perAcre:0.75, maxStandardAcres:200, note:'Optional field validation +$500. Above 200 acres: individually scoped.' },
+  'Precision Soil Testing': { display:'Precision Soil Testing', baseFee:1750, perAcre:8.00, note:'Wet-lab composites: $22 each including shipping. Compaction testing excluded.' },
+  'Prescribed Fire Planning': { display:'Prescribed Fire Planning', baseFee:1450, perAcre:3.70, note:'Planning only; implementation, Burn Boss, personnel and equipment excluded.' },
+  'RGB Aerial Mapping': { display:'RGB Aerial Mapping', baseFee:500, perAcre:2.00, note:'Processed RGB imagery and standard map outputs.' },
+  'Multispectral Mapping': { display:'Multispectral Mapping', baseFee:500, perAcre:8.00, note:'Processed multispectral imagery/indices; no substantial technical interpretation.' },
+  'Multispectral Mapping + Analysis': { display:'Multispectral Mapping + Analysis', baseFee:500, perAcre:12.00, note:'Includes technical interpretation; ground verification required for stronger causal conclusions.' }
+};
+const LANDS_FIELD_VALIDATION = 500;
+const WET_LAB_PER_COMPOSITE = 22;
+const STORAGE_HISTORY = 'atx-quote-history-v2';
 
-  const STORAGE_PRICING = 'atx-pricing-tuning';
-  const STORAGE_HISTORY = 'atx-quote-history';
+let currentQuoteResult = null;
 
-  // ═══════════════════════════════════════════════════════
-  // STATE
-  // ═══════════════════════════════════════════════════════
+function fmtMoney(val) {
+  if (!Number.isFinite(Number(val))) return '$0.00';
+  return '$' + Number(val).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_HISTORY) || '[]'); } catch(e) { return []; }
+}
+function saveHistory(history) { localStorage.setItem(STORAGE_HISTORY, JSON.stringify(history)); }
 
-  let currentPricing = loadPricing();
-  let currentQuoteResult = null;
-
-  // ═══════════════════════════════════════════════════════
-  // UTILITIES
-  // ═══════════════════════════════════════════════════════
-
-  function fmtMoney(val) {
-    if (isNaN(val) || val === null) return '$0.00';
-    const abs = Math.abs(val);
-    const s = '$' + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return val < 0 ? '−' + s : s;
-  }
-
-  function loadPricing() {
-    try {
-      const stored = localStorage.getItem(STORAGE_PRICING);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // merge with defaults so new offerings appear
-        return Object.assign({}, DEFAULT_PRICING, parsed);
-      }
-    } catch (e) {}
-    return JSON.parse(JSON.stringify(DEFAULT_PRICING));
-  }
-
-  function savePricing() {
-    localStorage.setItem(STORAGE_PRICING, JSON.stringify(currentPricing));
-  }
-
-  function loadHistory() {
-    try {
-      const stored = localStorage.getItem(STORAGE_HISTORY);
-      if (stored) return JSON.parse(stored);
-    } catch (e) {}
-    return [];
-  }
-
-  function saveHistory(history) {
-    localStorage.setItem(STORAGE_HISTORY, JSON.stringify(history));
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // NAVIGATION
-  // ═══════════════════════════════════════════════════════
-
-  document.querySelectorAll('nav button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      btn.classList.add('active');
-      const viewId = 'view-' + btn.dataset.view;
-      document.getElementById(viewId).classList.add('active');
-      window.scrollTo(0, 0);
-
-      if (btn.dataset.view === 'history') renderHistory();
-      if (btn.dataset.view === 'tuning') renderTuning();
-    });
-  });
-
-  // ═══════════════════════════════════════════════════════
-  // OFFERING FIELD VISIBILITY
-  // ═══════════════════════════════════════════════════════
-
-  function updateFieldVisibility() {
-    const offering = document.getElementById('offering').value;
-    const isPli = offering === 'Precision Land Intelligence';
-    const isSoilTesting = offering.startsWith('Soil Testing');
-
-    document.getElementById('landUsesField').classList.toggle('hidden', !isPli);
-    document.getElementById('acreageField').classList.toggle('hidden', isSoilTesting);
-    document.getElementById('sampleCountField').classList.toggle('hidden', !isSoilTesting);
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // CALCULATION
-  // ═══════════════════════════════════════════════════════
-
-  function calculate() {
-    const offering = document.getElementById('offering').value;
-    const acreage = parseFloat(document.getElementById('acreage').value) || 0;
-    const sampleCount = parseFloat(document.getElementById('sampleCount').value) || 0;
-    const huStatus = document.getElementById('huStatus').value;
-    const complexity = parseFloat(document.getElementById('complexity').value) || 1.0;
-    const costShare = document.getElementById('costShare').value;
-    const landUses = document.getElementById('landUses').value;
-
-    const pricing = currentPricing[offering];
-    if (!pricing) return;
-
-    const isSoilTesting = offering.startsWith('Soil Testing');
-    const unitCount = isSoilTesting ? sampleCount : acreage;
-    const baseFee = pricing.baseFee;
-    const perUnit = pricing.perUnit;
-    const subtotal = baseFee + (perUnit * unitCount);
-    const atxQuote = subtotal * complexity;
-
-    // NRCS envelope
-    let envelope = 0;
-    const envConfig = NRCS_ENVELOPES[offering];
-    if (envConfig) {
-      const rateKey = huStatus === 'HU' ? 'hu' : 'standard';
-      if (envConfig.flat) {
-        envelope = envConfig.flat[rateKey];
-      } else if (envConfig.perSample) {
-        envelope = envConfig.perSample[rateKey] * sampleCount;
-      } else if (envConfig[landUses]) {
-        envelope = envConfig[landUses][rateKey];
-      }
-    }
-
-    // Adjustments
-    const adjTravel = parseFloat(document.getElementById('adjTravel').value) || 0;
-    const adjBundle = parseFloat(document.getElementById('adjBundle').value) || 0;
-    const adjRepeat = parseFloat(document.getElementById('adjRepeat').value) || 0;
-    const adjCustom = parseFloat(document.getElementById('adjCustom').value) || 0;
-    const totalAdj = adjTravel + adjBundle + adjRepeat + adjCustom;
-
-    const finalQuote = atxQuote + totalAdj;
-    const clientNet = atxQuote - envelope;
-    const finalClientNet = finalQuote - envelope;
-
-    // Pattern recommendation
-    let pattern;
-    if (costShare === 'No') {
-      pattern = 'Pattern B — client not pursuing cost-share';
-    } else if (envelope === 0) {
-      pattern = 'Pattern B — no NRCS envelope for this offering';
-    } else if (finalQuote <= envelope) {
-      pattern = 'Pattern A — fits inside envelope; client net-positive';
-    } else if (finalQuote <= envelope * 1.15) {
-      pattern = 'Hybrid — slightly above envelope; discuss with client';
-    } else {
-      pattern = 'Pattern B — fee substantially exceeds envelope';
-    }
-
-    // Update display
-    document.getElementById('calcBaseFee').textContent = fmtMoney(baseFee);
-    document.getElementById('calcPerUnit').textContent = fmtMoney(perUnit);
-    document.getElementById('calcUnitCount').textContent = unitCount.toLocaleString();
-    document.getElementById('calcSubtotal').textContent = fmtMoney(subtotal);
-    document.getElementById('calcAtxQuote').textContent = fmtMoney(atxQuote);
-    document.getElementById('calcNrcsEnvelope').textContent = fmtMoney(envelope);
-    document.getElementById('calcClientNet').textContent = fmtMoney(clientNet);
-    document.getElementById('calcPattern').textContent = pattern;
-    document.getElementById('calcFinalQuote').textContent = fmtMoney(finalQuote);
-    document.getElementById('calcFinalClientNet').textContent = fmtMoney(finalClientNet);
-
-    document.getElementById('clientNetRow').classList.toggle('negative', clientNet < 0);
-    document.getElementById('finalClientNetRow').classList.toggle('negative', finalClientNet < 0);
-
-    // Store current result for actions
-    currentQuoteResult = {
-      timestamp: new Date().toISOString(),
-      clientName: document.getElementById('clientName').value,
-      clientEmail: document.getElementById('clientEmail').value,
-      propertyLocation: document.getElementById('propertyLocation').value,
-      offering, unitCount, isSoilTesting, landUses, huStatus,
-      complexity, costShare, baseFee, perUnit, subtotal,
-      atxQuote, envelope, clientNet,
-      adjustments: { travel: adjTravel, bundle: adjBundle, repeat: adjRepeat, custom: adjCustom, total: totalAdj },
-      finalQuote, finalClientNet, pattern,
-    };
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // EMAIL GENERATION
-  // ═══════════════════════════════════════════════════════
-
-  function generateEmailBody(q) {
-    const lines = [];
-    lines.push(`Hi ${q.clientName || 'there'},`);
-    lines.push('');
-    lines.push('Thank you for the conversation today. Below is a preliminary pricing summary based on what we discussed. A formal scoped proposal will follow.');
-    lines.push('');
-    lines.push('─────────────────────────────');
-    lines.push('PROPERTY & SCOPE');
-    lines.push('─────────────────────────────');
-    if (q.propertyLocation) lines.push(`Location: ${q.propertyLocation}`);
-    lines.push(`Service: ${q.offering}`);
-    if (q.offering === 'Precision Land Intelligence') lines.push(`Land uses: ${q.landUses}`);
-    if (q.isSoilTesting) {
-      lines.push(`Sample count: ${q.unitCount}`);
-    } else {
-      lines.push(`Acreage: ${q.unitCount.toLocaleString()} ac`);
-    }
-    lines.push('');
-    lines.push('─────────────────────────────');
-    lines.push('PRELIMINARY ESTIMATE');
-    lines.push('─────────────────────────────');
-    lines.push(`Estimated investment: ${fmtMoney(q.finalQuote)}`);
-    if (q.envelope > 0 && q.costShare !== 'No') {
-      lines.push(`NRCS payment (to you): ${fmtMoney(q.envelope)}`);
-      lines.push(`Your estimated net cost after reimbursement: ${fmtMoney(q.finalClientNet)}`);
-    }
-    lines.push('');
-    lines.push('This is a preliminary summary. A formal scoped proposal with detailed deliverables and terms will follow within a few days.');
-    lines.push('');
-    lines.push('Please reach out with any questions.');
-    lines.push('');
-    lines.push('Jason Oliver');
-    lines.push('AeroTerraX Land Solutions');
-    lines.push('Smarter Land. Healthy Habitat.');
-    return lines.join('\n');
-  }
-
-  function generateEmailSubject(q) {
-    let subj = 'AeroTerraX Preliminary Pricing';
-    if (q.clientName) subj += ` — ${q.clientName}`;
-    return subj;
-  }
-
-  function sendEmail() {
-    if (!currentQuoteResult) {
-      alert('Fill in the quote details first.');
-      return;
-    }
-    const q = currentQuoteResult;
-    if (!q.clientEmail) {
-      alert('Add a Client Email to send the summary.');
-      return;
-    }
-
-    // Ask for CC email (self) — remembered in localStorage
-    let selfEmail = localStorage.getItem('atx-self-email') || '';
-    if (!selfEmail) {
-      selfEmail = prompt('Your email address (for CC on quote emails; saved for next time):') || '';
-      if (selfEmail) localStorage.setItem('atx-self-email', selfEmail);
-    }
-
-    const subject = encodeURIComponent(generateEmailSubject(q));
-    const body = encodeURIComponent(generateEmailBody(q));
-    const to = encodeURIComponent(q.clientEmail);
-    const cc = selfEmail ? '&cc=' + encodeURIComponent(selfEmail) : '';
-    const mailto = `mailto:${to}?subject=${subject}${cc}&body=${body}`;
-
-    window.location.href = mailto;
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // SAVE TO HISTORY
-  // ═══════════════════════════════════════════════════════
-
-  function saveQuoteToHistory() {
-    if (!currentQuoteResult) {
-      alert('Fill in the quote details first.');
-      return;
-    }
-    if (!currentQuoteResult.clientName) {
-      if (!confirm('No Client Name entered. Save anyway?')) return;
-    }
-    const history = loadHistory();
-    history.unshift(currentQuoteResult);
-    saveHistory(history);
-    alert('Quote saved to history.');
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // CLEAR FORM
-  // ═══════════════════════════════════════════════════════
-
-  function clearForm() {
-    if (!confirm('Clear all fields and start a new quote?')) return;
-    document.getElementById('clientName').value = '';
-    document.getElementById('clientEmail').value = '';
-    document.getElementById('propertyLocation').value = '';
-    document.getElementById('acreage').value = '0';
-    document.getElementById('sampleCount').value = '0';
-    document.getElementById('landUses').value = 'Two Land Uses';
-    document.getElementById('huStatus').value = 'Standard';
-    document.getElementById('complexity').value = '1.0';
-    document.getElementById('costShare').value = 'Yes';
-    document.getElementById('adjTravel').value = '0';
-    document.getElementById('adjBundle').value = '0';
-    document.getElementById('adjRepeat').value = '0';
-    document.getElementById('adjCustom').value = '0';
-    calculate();
-    window.scrollTo(0, 0);
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // HISTORY VIEW
-  // ═══════════════════════════════════════════════════════
-
-  function renderHistory() {
-    const container = document.getElementById('historyList');
-    const history = loadHistory();
-
-    if (history.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <h3>No saved quotes yet</h3>
-          <div>Build a quote and tap Save to Quote History.</div>
-        </div>`;
-      return;
-    }
-
-    let html = '';
-    history.forEach((q, idx) => {
-      const d = new Date(q.timestamp);
-      const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const clientDisplay = q.clientName || '(no client name)';
-      const scopeParts = [q.offering];
-      if (q.isSoilTesting) {
-        scopeParts.push(`${q.unitCount} samples`);
-      } else {
-        scopeParts.push(`${q.unitCount.toLocaleString()} ac`);
-      }
-      const scope = scopeParts.join(' · ');
-
-      html += `
-        <div class="history-item">
-          <div class="header">
-            <div class="client">${escapeHtml(clientDisplay)}</div>
-            <div class="amount">${fmtMoney(q.finalQuote)}</div>
-          </div>
-          <div class="meta">${dateStr} · ${escapeHtml(scope)}</div>
-          <div class="meta"><strong>Pattern:</strong> ${escapeHtml(q.pattern)}</div>
-          <div class="actions">
-            <button class="btn btn-small btn-tertiary" data-action="reload" data-idx="${idx}">Reload into form</button>
-            <button class="btn btn-small btn-danger" data-action="delete" data-idx="${idx}">Delete</button>
-          </div>
-        </div>`;
-    });
-    container.innerHTML = html;
-
-    container.querySelectorAll('button[data-action]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const action = btn.dataset.action;
-        const idx = parseInt(btn.dataset.idx, 10);
-        if (action === 'delete') {
-          if (confirm('Delete this saved quote?')) {
-            const h = loadHistory();
-            h.splice(idx, 1);
-            saveHistory(h);
-            renderHistory();
-          }
-        } else if (action === 'reload') {
-          reloadQuote(history[idx]);
-        }
-      });
-    });
-  }
-
-  function reloadQuote(q) {
-    document.getElementById('clientName').value = q.clientName || '';
-    document.getElementById('clientEmail').value = q.clientEmail || '';
-    document.getElementById('propertyLocation').value = q.propertyLocation || '';
-    document.getElementById('offering').value = q.offering;
-    if (q.isSoilTesting) {
-      document.getElementById('sampleCount').value = q.unitCount;
-    } else {
-      document.getElementById('acreage').value = q.unitCount;
-    }
-    if (q.landUses) document.getElementById('landUses').value = q.landUses;
-    document.getElementById('huStatus').value = q.huStatus;
-    document.getElementById('complexity').value = q.complexity.toString();
-    document.getElementById('costShare').value = q.costShare;
-    if (q.adjustments) {
-      document.getElementById('adjTravel').value = q.adjustments.travel || 0;
-      document.getElementById('adjBundle').value = q.adjustments.bundle || 0;
-      document.getElementById('adjRepeat').value = q.adjustments.repeat || 0;
-      document.getElementById('adjCustom').value = q.adjustments.custom || 0;
-    }
-    updateFieldVisibility();
-    calculate();
-    // Switch to quote view
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelector('nav button[data-view="quote"]').classList.add('active');
-    document.getElementById('view-quote').classList.add('active');
-    window.scrollTo(0, 0);
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // TUNING VIEW
-  // ═══════════════════════════════════════════════════════
-
-  function renderTuning() {
-    const container = document.getElementById('tuningList');
-    let html = '';
-    Object.entries(currentPricing).forEach(([offering, config]) => {
-      const unitLabel = config.unit === 'sample' ? 'Per Sample ($)' : 'Per Acre ($)';
-      html += `
-        <div class="pricing-tune-row">
-          <div class="offering-name">${escapeHtml(offering)}</div>
-          <div class="fields">
-            <div>
-              <label>Base Fee ($)</label>
-              <input type="number" inputmode="decimal" data-offering="${escapeHtml(offering)}" data-field="baseFee" value="${config.baseFee}" step="10">
-            </div>
-            <div>
-              <label>${unitLabel}</label>
-              <input type="number" inputmode="decimal" data-offering="${escapeHtml(offering)}" data-field="perUnit" value="${config.perUnit}" step="0.25">
-            </div>
-          </div>
-        </div>`;
-    });
-    container.innerHTML = html;
-
-    container.querySelectorAll('input[data-offering]').forEach(input => {
-      input.addEventListener('change', () => {
-        const off = input.dataset.offering;
-        const field = input.dataset.field;
-        const val = parseFloat(input.value) || 0;
-        currentPricing[off][field] = val;
-        savePricing();
-        calculate();  // recalc live if the current offering was tuned
-      });
-    });
-  }
-
-  function resetPricing() {
-    if (!confirm('Reset all pricing to defaults? Your tuning will be lost.')) return;
-    currentPricing = JSON.parse(JSON.stringify(DEFAULT_PRICING));
-    savePricing();
-    renderTuning();
-    calculate();
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // EVENT WIRING
-  // ═══════════════════════════════════════════════════════
-
-  // All quote-input fields trigger recalc
-  const recalcFields = [
-    'offering', 'landUses', 'acreage', 'sampleCount', 'huStatus', 'complexity',
-    'costShare', 'clientName', 'clientEmail', 'propertyLocation',
-    'adjTravel', 'adjBundle', 'adjRepeat', 'adjCustom',
-  ];
-  recalcFields.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('input', () => {
-        if (id === 'offering') updateFieldVisibility();
-        calculate();
-      });
-      el.addEventListener('change', () => {
-        if (id === 'offering') updateFieldVisibility();
-        calculate();
-      });
-    }
+    btn.classList.add('active');
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    if (btn.dataset.view === 'history') renderHistory();
+    if (btn.dataset.view === 'pricing') renderPricingReference();
+    window.scrollTo(0,0);
   });
+});
 
-  document.getElementById('btnEmail').addEventListener('click', sendEmail);
-  document.getElementById('btnSave').addEventListener('click', saveQuoteToHistory);
-  document.getElementById('btnClear').addEventListener('click', clearForm);
-  document.getElementById('btnResetPricing').addEventListener('click', resetPricing);
+function updateFieldVisibility() {
+  const offering = document.getElementById('offering').value;
+  const isLands = offering === 'LAnDS';
+  const isSoil = offering === 'Precision Soil Testing';
+  document.getElementById('landsValidationField').classList.toggle('hidden', !isLands);
+  document.getElementById('landsValidationCalcRow').classList.toggle('hidden', !isLands);
+  document.getElementById('wetLabField').classList.toggle('hidden', !isSoil);
+  document.getElementById('wetLabCalcRow').classList.toggle('hidden', !isSoil);
+}
 
-  // Initial paint
-  updateFieldVisibility();
+function calculate() {
+  const offering = document.getElementById('offering').value;
+  const acreage = Math.max(0, num('acreage'));
+  const p = PRICING[offering];
+  if (!p) return;
+
+  const coreFee = p.baseFee + p.perAcre * acreage;
+  const landsValidation = offering === 'LAnDS' && document.getElementById('landsValidation').value === 'Yes' ? LANDS_FIELD_VALIDATION : 0;
+  const wetLabCount = offering === 'Precision Soil Testing' ? Math.max(0, Math.floor(num('wetLabCount'))) : 0;
+  const wetLab = wetLabCount * WET_LAB_PER_COMPOSITE;
+  const travel = Math.max(0, num('adjTravel'));
+  const printing = Math.max(0, num('adjPrinting'));
+  const other = Math.max(0, num('adjOther'));
+  const directTotal = landsValidation + wetLab + travel + printing + other;
+  const finalQuote = coreFee + directTotal;
+
+  const scopeStatus = document.getElementById('scopeStatus').value;
+  const overBoundary = p.maxStandardAcres && acreage > p.maxStandardAcres;
+  const reviewRequired = overBoundary || scopeStatus === 'Atypical';
+  const warning = document.getElementById('scopeWarning');
+  if (reviewRequired) {
+    let msg = '<strong>Individual scope review required.</strong> ';
+    if (overBoundary) msg += `${p.display} standard formula is validated through ${p.maxStandardAcres} acres. `;
+    if (scopeStatus === 'Atypical') msg += 'Scope has been marked atypical. ';
+    msg += 'Do not rely on an automatic complexity multiplier; confirm a project-specific quote.';
+    warning.innerHTML = msg;
+    warning.classList.remove('hidden');
+  } else {
+    warning.classList.add('hidden');
+    warning.innerHTML = '';
+  }
+
+  document.getElementById('calcBaseFee').textContent = fmtMoney(p.baseFee);
+  document.getElementById('calcPerAcre').textContent = fmtMoney(p.perAcre);
+  document.getElementById('calcAcreage').textContent = acreage.toLocaleString('en-US', {maximumFractionDigits:1});
+  document.getElementById('calcCoreFee').textContent = fmtMoney(coreFee);
+  document.getElementById('calcLandsValidation').textContent = fmtMoney(landsValidation);
+  document.getElementById('calcWetLab').textContent = `${fmtMoney(wetLab)} (${wetLabCount} × ${fmtMoney(WET_LAB_PER_COMPOSITE)})`;
+  document.getElementById('calcDirectCosts').textContent = fmtMoney(directTotal);
+  document.getElementById('calcCoreSummary').textContent = fmtMoney(coreFee);
+  document.getElementById('calcDirectSummary').textContent = fmtMoney(directTotal);
+  document.getElementById('calcFinalQuote').textContent = fmtMoney(finalQuote);
+  document.getElementById('calcControl').textContent = reviewRequired ? `${PRICING_CONTROL} · INDIVIDUAL REVIEW REQUIRED` : PRICING_CONTROL;
+
+  currentQuoteResult = {
+    schemaVersion: 2,
+    timestamp: new Date().toISOString(),
+    clientName: document.getElementById('clientName').value,
+    clientEmail: document.getElementById('clientEmail').value,
+    propertyLocation: document.getElementById('propertyLocation').value,
+    offering, offeringDisplay:p.display, acreage, scopeStatus, reviewRequired,
+    baseFee:p.baseFee, perAcre:p.perAcre, coreFee,
+    landsValidation, wetLabCount, wetLab,
+    travel, printing, other,
+    directCostNotes:document.getElementById('directCostNotes').value,
+    directTotal, finalQuote, pricingControl:PRICING_CONTROL
+  };
+}
+
+function generateEmailBody(q) {
+  const lines = [];
+  lines.push(`Hi ${q.clientName || 'there'},`, '');
+  lines.push('Thank you for the conversation. Below is a preliminary estimate based on the scope discussed. A formal scoped proposal will follow.', '');
+  lines.push('PROPERTY & SCOPE');
+  lines.push('─────────────────────────────');
+  if (q.propertyLocation) lines.push(`Location: ${q.propertyLocation}`);
+  lines.push(`Service: ${q.offeringDisplay}`);
+  lines.push(`Scoped acreage: ${q.acreage.toLocaleString()} ac`, '');
+  lines.push('PRELIMINARY ESTIMATE');
+  lines.push('─────────────────────────────');
+  lines.push(`Core service fee: ${fmtMoney(q.coreFee)}`);
+  if (q.landsValidation) lines.push(`LAnDS field validation: ${fmtMoney(q.landsValidation)}`);
+  if (q.wetLab) lines.push(`Wet-lab composites (${q.wetLabCount}): ${fmtMoney(q.wetLab)}`);
+  if (q.travel) lines.push(`Travel / mobilization: ${fmtMoney(q.travel)}`);
+  if (q.printing) lines.push(`Vendor map printing: ${fmtMoney(q.printing)}`);
+  if (q.other) lines.push(`Other direct expense: ${fmtMoney(q.other)}`);
+  lines.push(`Estimated total: ${fmtMoney(q.finalQuote)}`);
+  if (q.reviewRequired) lines.push('', 'NOTE: This scope requires individual review before a final proposal is issued.');
+  lines.push('', 'This is a preliminary estimate, not an NRCS reimbursement estimate or guarantee. A formal scoped proposal with deliverables and terms will follow.', '');
+  lines.push('Jason Oliver', 'AeroTerraX Land Solutions', 'Smarter Land. Healthy Habitat.');
+  return lines.join('\n');
+}
+function sendEmail() {
   calculate();
-</script>
+  const q = currentQuoteResult;
+  if (!q.clientEmail) { alert('Add a Client Email to send the estimate summary.'); return; }
+  let selfEmail = localStorage.getItem('atx-self-email') || '';
+  if (!selfEmail) {
+    selfEmail = prompt('Your email address (for CC; saved for next time):') || '';
+    if (selfEmail) localStorage.setItem('atx-self-email', selfEmail);
+  }
+  const subject = encodeURIComponent('AeroTerraX Preliminary Estimate' + (q.clientName ? ` — ${q.clientName}` : ''));
+  const body = encodeURIComponent(generateEmailBody(q));
+  const cc = selfEmail ? '&cc=' + encodeURIComponent(selfEmail) : '';
+  window.location.href = `mailto:${encodeURIComponent(q.clientEmail)}?subject=${subject}${cc}&body=${body}`;
+}
+function saveQuoteToHistory() {
+  calculate();
+  if (!currentQuoteResult.clientName && !confirm('No Client Name entered. Save anyway?')) return;
+  const h = loadHistory(); h.unshift(currentQuoteResult); saveHistory(h);
+  alert('Estimate saved to history.');
+}
+function clearForm() {
+  if (!confirm('Clear all fields and start a new estimate?')) return;
+  ['clientName','clientEmail','propertyLocation','directCostNotes'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('offering').value='PLI';
+  document.getElementById('acreage').value='0';
+  document.getElementById('landsValidation').value='No';
+  document.getElementById('wetLabCount').value='0';
+  document.getElementById('scopeStatus').value='Standard';
+  ['adjTravel','adjPrinting','adjOther'].forEach(id => document.getElementById(id).value='0');
+  updateFieldVisibility(); calculate(); window.scrollTo(0,0);
+}
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  const history = loadHistory();
+  if (!history.length) {
+    container.innerHTML='<div class="empty-state"><h3>No saved v2.0 estimates yet</h3><div>Build an estimate and tap Save Estimate to History.</div></div>';
+    return;
+  }
+  container.innerHTML = history.map((q,idx) => {
+    const d=new Date(q.timestamp);
+    const dateStr=d.toLocaleDateString()+' '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    return `<div class="history-item">
+      <div class="header"><div class="client">${escapeHtml(q.clientName || '(no client name)')}</div><div class="amount">${fmtMoney(q.finalQuote)}</div></div>
+      <div class="meta">${dateStr} · ${escapeHtml(q.offeringDisplay || q.offering)} · ${Number(q.acreage||0).toLocaleString()} ac</div>
+      <div class="meta"><strong>Pricing:</strong> ${escapeHtml(q.pricingControl || PRICING_CONTROL)}${q.reviewRequired ? ' · REVIEW REQUIRED' : ''}</div>
+      <div class="actions"><button class="btn btn-small btn-tertiary" data-action="reload" data-idx="${idx}">Reload</button><button class="btn btn-small btn-danger" data-action="delete" data-idx="${idx}">Delete</button></div>
+    </div>`;
+  }).join('');
+  container.querySelectorAll('button[data-action]').forEach(btn => btn.addEventListener('click', () => {
+    const idx=parseInt(btn.dataset.idx,10);
+    if(btn.dataset.action==='delete'){
+      if(confirm('Delete this saved estimate?')){const h=loadHistory();h.splice(idx,1);saveHistory(h);renderHistory();}
+    } else reloadQuote(history[idx]);
+  }));
+}
+function reloadQuote(q) {
+  document.getElementById('clientName').value=q.clientName||'';
+  document.getElementById('clientEmail').value=q.clientEmail||'';
+  document.getElementById('propertyLocation').value=q.propertyLocation||'';
+  document.getElementById('offering').value=PRICING[q.offering] ? q.offering : 'PLI';
+  document.getElementById('acreage').value=q.acreage||0;
+  document.getElementById('landsValidation').value=q.landsValidation ? 'Yes' : 'No';
+  document.getElementById('wetLabCount').value=q.wetLabCount||0;
+  document.getElementById('scopeStatus').value=q.scopeStatus||'Standard';
+  document.getElementById('adjTravel').value=q.travel||0;
+  document.getElementById('adjPrinting').value=q.printing||0;
+  document.getElementById('adjOther').value=q.other||0;
+  document.getElementById('directCostNotes').value=q.directCostNotes||'';
+  updateFieldVisibility(); calculate();
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelector('nav button[data-view="quote"]').classList.add('active');
+  document.getElementById('view-quote').classList.add('active');
+  window.scrollTo(0,0);
+}
+function renderPricingReference() {
+  const c=document.getElementById('pricingReference');
+  c.innerHTML=Object.values(PRICING).map(p=>`<div class="reference-card"><div class="name">${escapeHtml(p.display)}</div><div class="rate">${fmtMoney(p.baseFee)} + ${fmtMoney(p.perAcre)}/acre</div><div class="note">${escapeHtml(p.note)}</div></div>`).join('')
+    + `<div class="reference-card"><div class="name">LAnDS Field Validation</div><div class="rate">${fmtMoney(LANDS_FIELD_VALIDATION)}</div><div class="note">Optional fixed add-on; applicable travel remains separate.</div></div>`
+    + `<div class="reference-card"><div class="name">Soil Wet-Lab Composite</div><div class="rate">${fmtMoney(WET_LAB_PER_COMPOSITE)}/sample</div><div class="note">Required composite sample; shipping included under current protocol.</div></div>`;
+}
 
+const recalcFields=['offering','acreage','landsValidation','wetLabCount','scopeStatus','clientName','clientEmail','propertyLocation','adjTravel','adjPrinting','adjOther','directCostNotes'];
+recalcFields.forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',()=>{if(id==='offering')updateFieldVisibility();calculate();});
+  el.addEventListener('change',()=>{if(id==='offering')updateFieldVisibility();calculate();});
+});
+document.getElementById('btnEmail').addEventListener('click',sendEmail);
+document.getElementById('btnSave').addEventListener('click',saveQuoteToHistory);
+document.getElementById('btnClear').addEventListener('click',clearForm);
+
+updateFieldVisibility();
+renderPricingReference();
+calculate();
+
+</script>
 </body>
 </html>
